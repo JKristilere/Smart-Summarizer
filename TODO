@@ -1,0 +1,15 @@
+- setup database using postgresql for production deployment - Done
+Create schema for inserting data into tables for podcast, audio and youtube tables - Done
+Add metadata into the vector db to enable search - Done
+History to the llm to remember conversations - WIP
+
+
+functionality for podcast transcription
+finish up docker build - Done
+finish up endpoints for backend - Done
+write code for the frontend using streamlit
+add optionality for user query; if query then using query embeddings, else just generate summary - Done
+Create README file - Done
+
+Add endpoint to ask follow-up questions
+Work on optimizing the code

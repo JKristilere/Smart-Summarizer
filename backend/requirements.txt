@@ -1,0 +1,31 @@
+# Core framework
+fastapi
+uvicorn[standard]
+pydantic
+
+# LangChain & LLMs
+langchain
+langchain-community
+langchain-yt-dlp
+sentence-transformers
+chromadb
+faiss-cpu
+
+# LLM connection helpers
+ollama
+groq
+transformers
+torch
+accelerate
+
+# Utilities
+youtube-transcript-api
+yt-dlp
+whisper
+pydub
+python-multipart
+requests
+tqdm
+python-dotenv
+pytube
+
