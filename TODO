@@ -1,7 +1,6 @@
 - setup database using postgresql for production deployment - Done
 Create schema for inserting data into tables for podcast, audio and youtube tables - Done
 Add metadata into the vector db to enable search - Done
-History to the llm to remember conversations - WIP
 
 
 functionality for podcast transcription
@@ -11,5 +10,9 @@ write code for the frontend using streamlit
 add optionality for user query; if query then using query embeddings, else just generate summary - Done
 Create README file - Done
 
-Add endpoint to ask follow-up questions
-Work on optimizing the code
+Add endpoint to ask follow-up questions - WIP
+History to the llm to remember conversations - WIP
+Implement ollama for llm instead of Groq - WIP
+Add signup and login functionality in order to create user_id to track conversations - WIP
+
+Work on optimizing the code - Done

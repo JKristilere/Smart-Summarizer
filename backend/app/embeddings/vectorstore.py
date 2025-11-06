@@ -1,7 +1,6 @@
 """Store embeddings in a vector store and perform similarity search."""
 import chromadb
 import numpy as np
-from app.db import DBManager
 from app.embeddings import EmbeddingManager
 from app.schema import YoutubeStoreSchema, AudioStoreSchema
 from app.db.models import Youtube, Audio
@@ -10,34 +9,41 @@ import uuid
 from typing import List, Dict, Any
 from datetime import datetime, timezone
 from config import settings
+from functools import lru_cache
 
-CHROMA_API_KEY =  settings.CHROMA_API_KEY
-CHROMA_TENANT_ID =  settings.CHROMA_TENANT
+CHROMA_API_KEY = settings.CHROMA_API_KEY
+CHROMA_TENANT_ID = settings.CHROMA_TENANT
 CHROMA_DATABASE = settings.CHROMA_DATABASE
-db_manager = DBManager(settings.DATABASE_URI)
+
+# Remove global db_manager - will be passed as parameter
+# db_manager = DBManager(settings.DATABASE_URI)
+
+_chroma_client = None
+
+
+@lru_cache(maxsize=1)
+def get_chroma_client():
+    return chromadb.CloudClient(
+        api_key=CHROMA_API_KEY,
+        tenant=CHROMA_TENANT_ID,
+        database=CHROMA_DATABASE
+    )
+
 
 class VectorStore:
     def __init__(self,
                  collection_name: str = "youtube_embeddings",
-                 embedding_manager: EmbeddingManager = None):
+                 embedding_manager: EmbeddingManager = None,
+                 db_manager=None):  # Add db_manager parameter
         self.embedding_manager = embedding_manager
         self.collection_name = collection_name
-        self.client = chromadb.CloudClient(
-            api_key=CHROMA_API_KEY,
-            tenant=CHROMA_TENANT_ID,
-            database=CHROMA_DATABASE
-        )
-        # try:
-            # Try to get existing collection first
+        self.client = get_chroma_client()  # reuse singleton
         self.collection = self.client.get_collection(self.collection_name)
-        # except Exception:
-        #     # If collection doesn't exist, create it
-        #     self.collection = self.client.create_collection(self.collection_name)
+        self.db_manager = db_manager  # Store for use in methods
 
     def add_youtube_documents(self, documents: List[Any], embeddings: List[np.ndarray]):
         """Adds documents and their embeddings to the vector store."""
-
-        if len(documents) !=  len(embeddings):
+        if len(documents) != len(embeddings):
             raise ValueError("The number of documents must match the number of embeddings.")
         
         # Prepare data for ChromaDB
@@ -45,6 +51,9 @@ class VectorStore:
         metadatas = []
         documents_text = []
         embeddings_list = []
+        
+        # Get video_id once (all docs from same video)
+        video_id = extract_video_id(documents[0].metadata["source"])
         
         for i, (doc, embedding) in enumerate(zip(documents, embeddings)):
             # Generate unique ID
@@ -55,7 +64,7 @@ class VectorStore:
             metadata = dict(doc.metadata)
             metadata['doc_index'] = i
             metadata['content_length'] = len(doc.page_content)
-            metadata["video_id"]= extract_video_id(doc.metadata["source"])
+            metadata["video_id"] = video_id
             metadatas.append(metadata)
             
             # Document content
@@ -66,6 +75,7 @@ class VectorStore:
         
         # Add to collection
         try:
+            # Add to ChromaDB
             self.collection.add(
                 ids=ids,
                 embeddings=embeddings_list,
@@ -73,24 +83,27 @@ class VectorStore:
                 documents=documents_text
             )
             
-            # Add to database
-            data = YoutubeStoreSchema(url=doc.metadata["source"], 
-                                      video_id=metadata["video_id"], 
-                                      content=doc.page_content, 
-                                      created_at=datetime.now(timezone.utc))
-            
-            db_manager.insert_data(Youtube, data)
-
+            # Add to database only if db_manager is provided
+            if self.db_manager:
+                # Store only once per video, not per chunk
+                data = YoutubeStoreSchema(
+                    url=documents[0].metadata["source"], 
+                    video_id=video_id, 
+                    content="\n\n".join(documents_text),  # Combine all chunks
+                    created_at=datetime.now(timezone.utc)
+                )
+                
+                self.db_manager.insert_data(Youtube, data)
             print(f"Successfully added {len(documents)} documents to vector store")
             print(f"Total documents in collection: {self.collection.count()}")
-            
+            return video_id
+        
         except Exception as e:
             raise RuntimeError(f"Failed to add documents to vector store: {e}")
     
-
     def add_audio_documents(self, filename: str, documents: List[Any], embeddings: List[np.ndarray]):
         """Adds documents and their embeddings to the vector store."""
-        if len(documents) !=  len(embeddings):
+        if len(documents) != len(embeddings):
             raise ValueError("The number of documents must match the number of embeddings.")
         
         # Prepare data for ChromaDB
@@ -99,16 +112,16 @@ class VectorStore:
         metadatas = []
         documents_text = []
         embeddings_list = []
+        created_at = datetime.now(timezone.utc)
 
-        for doc, embedding in zip(documents, embeddings):
+        for i, (doc, embedding) in enumerate(zip(documents, embeddings)):
             # Generate unique ID
-            created_at = datetime.now(timezone.utc)
-            doc_id = f"doc_{uuid.uuid4().hex[:8]}"
+            doc_id = f"doc_{uuid.uuid4().hex[:8]}_{i}"
             ids.append(doc_id)
 
             # Prepare metadata
             metadata = {
-                "doc_index": documents.index(doc),
+                "doc_index": i,
                 "context_length": len(doc),
                 "file_id": file_id
             }
@@ -120,9 +133,9 @@ class VectorStore:
             # Embedding
             embeddings_list.append(embedding)
 
-
         # Add to collection
         try:
+            # Add to ChromaDB
             self.collection.add(
                 ids=ids,
                 embeddings=embeddings_list,
@@ -130,19 +143,22 @@ class VectorStore:
                 documents=documents_text
             )
 
-            # Add to database
-            data = AudioStoreSchema(file_id=file_id, 
-                                    content=doc, 
-                                    created_at=created_at)
-            
-            db_manager.insert_data(Audio, data)
-
+            # Add to database only if db_manager is provided
+            if self.db_manager:
+                data = AudioStoreSchema(
+                    file_id=file_id, 
+                    content="\n\n".join(documents_text),  # Combine all chunks
+                    created_at=created_at
+                )
+                
+                self.db_manager.insert_data(Audio, data)
             print(f"Successfully added {len(documents)} documents to vector store")
             print(f"Total documents in collection: {self.collection.count()}")
+            return file_id
+
 
         except Exception as e:
             raise RuntimeError(f"Failed to add documents to vector store: {e}")
-
 
     def similarity_search(self, query_embedding: List[float], top_k: int = 5):
         """Search for the top_k most similar documents to the query embedding."""
@@ -152,7 +168,6 @@ class VectorStore:
         )
         return results['documents'][0]
     
-
     def query(self, query_text: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """Generate embedding for the query text and perform similarity search."""
         query_embedding = self.embedding_manager.create_embeddings([query_text])
@@ -160,11 +175,8 @@ class VectorStore:
     
     def query_by_metadata(self, metadata_filter: Dict[str, Any]):
         """Query documents based on metadata filters."""
-        results = self.collection.get(
-            where=metadata_filter
-            )
+        results = self.collection.get(where=metadata_filter)
         return results['documents']
-        # return results
     
     def clear_collection(self) -> None:
         """Clear all data from the collection."""
@@ -174,11 +186,8 @@ class VectorStore:
     def delete_data(self, filter):
         """Remove data based on the filter provided."""
         try:
-            self.collection.delete(
-            where=filter
-        )
+            self.collection.delete(where=filter)
             print("Data deleted successfully")
-
         except Exception as e:
             raise ValueError(f"Error deleting data: {e}")
         
