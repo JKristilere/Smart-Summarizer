@@ -1,14 +1,6 @@
 version: "3.9"
 
 services:
-  chroma:
-    image: chromadb/chroma:latest
-    container_name: chroma
-    ports:
-      - "8001:8000"
-    volumes:
-      - ./data/chroma:/chroma
-
   postgres:
     image: postgres:15-alpine
     container_name: postgres_db
@@ -16,42 +8,47 @@ services:
     env_file:
       - .env
     environment:
-      # fallback in case .env isn't picked up by your tooling
       POSTGRES_USER: ${POSTGRES_USER:-summarizer}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       POSTGRES_DB: ${POSTGRES_DB:-summarizer_db}
     ports:
       - "5432:5432"
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-summarizer}"]
       interval: 10s
       timeout: 5s
       retries: 5
-
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ./data/ollama:/root/.ollama
-    restart: unless-stopped
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: youtube_backend
     ports:
       - "8000:8000"
     env_file:
       - .env
+    environment:
+      - PYTHONUNBUFFERED=1
     volumes:
       - ./data:/app/data
     depends_on:
-      - chroma
-
-      - postgres
+      postgres:
+        condition: service_healthy
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
 
   frontend:
     build: ./frontend
@@ -60,3 +57,12 @@ services:
       - "8501:8501"
     depends_on:
       - backend
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
+volumes:
+  postgres_data:
