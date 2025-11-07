@@ -13,7 +13,7 @@ class AudioSchema(BaseModel):
     query: Optional[str] = None
 
 class ChatHistory(BaseModel):
-    user_id: str
+    file_id: str
     conversation_id: str
     role: str
     message: str
