@@ -6,13 +6,17 @@ Add metadata into the vector db to enable search - Done
 functionality for podcast transcription
 finish up docker build - Done
 finish up endpoints for backend - Done
-write code for the frontend using streamlit
+
 add optionality for user query; if query then using query embeddings, else just generate summary - Done
 Create README file - Done
 
-Add endpoint to ask follow-up questions - WIP
-History to the llm to remember conversations - WIP
-Implement ollama for llm instead of Groq - WIP
+Add endpoint to ask follow-up questions - Done
+History to the llm to remember conversations - Done
+Implement ollama for llm instead of Groq - Done
 Add signup and login functionality in order to create user_id to track conversations - WIP
 
+Work on context retrieval for audio and youtube endpoints - Done
+
 Work on optimizing the code - Done
+
+write code for the frontend using streamlit - WIP

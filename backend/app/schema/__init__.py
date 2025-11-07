@@ -25,7 +25,22 @@ class AudioSchema(BaseModel):
     query: Optional[str] = None
 
 class ChatHistorySchema(BaseModel):
-    # user_id: str
-    role: str
+    """Schema for storing chat messages"""
+    role: str  # "user" or "assistant"
     message: str
+    file_id: Optional[str] = None  # video_id or audio file_id to link chat to content
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class ChatRequest(BaseModel):
+    """Schema for chat requests"""
+    query: str
+    file_id: str  # video_id or audio file_id
+    include_vector_search: bool = True
+    top_k: int = 3
+
+
+class ChatHistoryRequest(BaseModel):
+    """Schema for retrieving chat history"""
+    file_id: str
+    limit: int = 50

@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     # LLM Settings
     GROQ_API_KEY: str
     OLLAMA_API_KEY: str
+    OLLAMA_HOST: str
+    OLLAMA_MODEL: str
 
     # Database Settings (PostGres)
     POSTGRES_USER: str
