@@ -45,20 +45,20 @@ class RetrievalManager:
             ]
         
 
-        # # Using Groq
-        # response = self.groq_client.chat.completions.create(
-        #     model="llama-3.3-70b-versatile",
-        #     messages=messages,
-        # )
-        # summary = response.choices[0].message.content
-
-
-        #Using Ollama
-        response = self.ollama_client.chat(
-                model = self.ollama_model,
-                messages=messages
+        # Using Groq
+        response = self.groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
         )
-        summary = response.message.content
+        summary = response.choices[0].message.content
+
+
+        # #Using Ollama
+        # response = self.ollama_client.chat(
+        #         model = self.ollama_model,
+        #         messages=messages
+        # )
+        # summary = response.message.content
 
 
         # Save to chat history if db_manager is available
@@ -96,21 +96,21 @@ class RetrievalManager:
                  "content": prompt}
             ]
         
-        # # Using Groq
-        # response = self.groq_client.chat.completions.create(
-        #     model="llama-3.3-70b-versatile",
-        #     messages=messages,
-        # )
-        
-        # summary = response.choices[0].message.content
-
-        ## Using Ollama
-        response = self.ollama_client.chat(
-                model = self.ollama_model,
-                messages=messages
+        # Using Groq
+        response = self.groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
         )
+        
+        summary = response.choices[0].message.content
 
-        summary = response.message.content
+        # ## Using Ollama
+        # response = self.ollama_client.chat(
+        #         model = self.ollama_model,
+        #         messages=messages
+        # )
+
+        # summary = response.message.content
         
         
         # Save to chat history if db_manager is available
@@ -155,20 +155,20 @@ class RetrievalManager:
         ]
         
 
-        ## Using Groq
-        # response = self.groq_client.chat.completions.create(
-        #     model="llama-3.3-70b-versatile",
-        #     messages=messages,
-        # )
-        # answer = response.choices[0].message.content
-
-
-        ## Using Ollama
-        response = self.ollama_client.chat(
-                model = self.ollama_model,
-                messages=messages
+        # Using Groq
+        response = self.groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
         )
-        answer = response.message.content
+        answer = response.choices[0].message.content
+
+
+        # ## Using Ollama
+        # response = self.ollama_client.chat(
+        #         model = self.ollama_model,
+        #         messages=messages
+        # )
+        # answer = response.message.content
 
 
         # Save query and response to chat history if db_manager is available
@@ -272,20 +272,20 @@ class RetrievalManager:
         
         # Get response
 
-        ## Using Groq
-        # response = self.groq_client.chat.completions.create(
-        #     model="llama-3.3-70b-versatile",
-        #     messages=messages,
-        # )
-        
-        # answer = response.choices[0].message.content
-
-        ## Using Ollama
-        response = self.ollama_client.chat(
-                model = self.ollama_model,
-                messages=messages
+        # Using Groq
+        response = self.groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
         )
-        answer = response.message.content
+        
+        answer = response.choices[0].message.content
+
+        # ## Using Ollama
+        # response = self.ollama_client.chat(
+        #         model = self.ollama_model,
+        #         messages=messages
+        # )
+        # answer = response.message.content
 
         # Save to chat history
         if self.db_manager:
@@ -368,29 +368,11 @@ class RetrievalManager:
         # Get streaming response
 
 
-        ## Using Groq
-        # stream = self.groq_client.chat.completions.create(
-        #     model="llama-3.3-70b-versatile",
-        #     messages=messages,
-        #     stream=True,
-        # )
-        
-        # # Collect full response for saving
-        # full_response = []
-        
-        # # Stream chunks
-        # for chunk in stream:
-        #     if chunk.choices[0].delta.content:
-        #         content = chunk.choices[0].delta.content
-        #         full_response.append(content)
-        #         yield content
-
-
-        ## Using Ollama
-        stream = self.ollama_client.chat(
-            model = self.ollama_model,
+        # Using Groq
+        stream = self.groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
             messages=messages,
-            stream=True
+            stream=True,
         )
         
         # Collect full response for saving
@@ -398,10 +380,28 @@ class RetrievalManager:
         
         # Stream chunks
         for chunk in stream:
-            if chunk.message.content:
-                content = chunk.message.content
+            if chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
                 full_response.append(content)
                 yield content
+
+
+        # ## Using Ollama
+        # stream = self.ollama_client.chat(
+        #     model = self.ollama_model,
+        #     messages=messages,
+        #     stream=True
+        # )
+        
+        # # Collect full response for saving
+        # full_response = []
+        
+        # # Stream chunks
+        # for chunk in stream:
+        #     if chunk.message.content:
+        #         content = chunk.message.content
+        #         full_response.append(content)
+        #         yield content
         
         # Save to chat history after streaming completes
         if self.db_manager:
