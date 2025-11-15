@@ -22,7 +22,7 @@
 1. Clone the repository:
 
    ```bash
-   git clone [https://github.com/your-username/your-repo.git](https://github.com/your-username/your-repo.git)
+   git clone https://github.com/JKristilere/Smart-Summarizer.git
    ```
 
 2. Install the dependencies:
@@ -36,14 +36,35 @@
    ```bash
     export GROQ_API_KEY=your-groq-api-key
     export CHROMA_API_KEY=your-chroma-api-key
+    export DATABASE_URI=your-postgres-database-url
    ```
 
    Note: You can obtain an GROQ API key from [here](https://ollama.ai/) and a Chroma API key from [here](https://www.trychroma.com/).
 
-
-4. Run the app:
+4. Run the db migrations script:
 
    ```bash
+   cd backend
+   python migrations.db_migrations
+   ```
+
+
+
+## Running the App
+
+- Run the backend server:
+
+   ```bash
+   cd backend
+   uvicorn main:app --reload
+   ```
+
+   This will start the FastAPI server on http://localhost:8000.
+
+- Run the Streamlit app:
+
+   ```bash
+   cd frontend
    streamlit run app.py
    ```
 
