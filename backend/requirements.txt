@@ -1,31 +1,68 @@
 # Core framework
-fastapi
-uvicorn[standard]
-pydantic
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+pydantic==2.9.0
+pydantic-settings==2.5.0
 
-# LangChain & LLMs
-langchain
-langchain-community
-langchain-yt-dlp
-sentence-transformers
-chromadb
-faiss-cpu
+# Database
+sqlalchemy==2.0.35
+psycopg2-binary==2.9.9
 
-# LLM connection helpers
-ollama
-groq
-transformers
-torch
-accelerate
+# LangChain (minimal)
+langchain==0.3.0
+langchain-community==0.3.0
+
+# Embeddings & Vector Store
+sentence-transformers==3.1.0
+chromadb==0.5.0
+
+# LLM APIs
+groq==0.11.0
+ollama==0.3.0
 
 # Utilities
-youtube-transcript-api
-yt-dlp
-whisper
-pydub
-python-multipart
-requests
-tqdm
-python-dotenv
-pytube
+youtube-transcript-api==0.6.2
+python-multipart==0.0.9
+python-dotenv==1.0.1
+requests==2.32.3
+
+# Don't install these heavy packages on free tier:
+# torch - comes with sentence-transformers
+# transformers - comes with sentence-transformers
+# faiss-cpu - not needed with ChromaDB cloud
+# whisper - using Groq API instead
+# accelerate - not needed
+
+
+
+# # Core framework
+# fastapi
+# uvicorn[standard]
+# pydantic
+
+# # LangChain & LLMs
+# langchain
+# langchain-community
+# langchain-yt-dlp
+# sentence-transformers
+# chromadb
+# faiss-cpu
+
+# # LLM connection helpers
+# ollama
+# groq
+# transformers
+# torch
+# accelerate
+
+# # Utilities
+# youtube-transcript-api
+# yt-dlp
+# whisper
+# pydub
+# python-multipart
+# requests
+# tqdm
+# python-dotenv
+# pytube
 

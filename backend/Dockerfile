@@ -23,6 +23,7 @@ WORKDIR /app
 # Install only runtime dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python packages from builder
@@ -40,5 +41,5 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 EXPOSE 8000
 
-# Use multiple workers for production
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+# Use SINGLE worker for Render free tier (512MB RAM limit)
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
