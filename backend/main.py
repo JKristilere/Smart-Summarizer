@@ -11,11 +11,11 @@ from app.dependencies import get_embedding_manager
 async def lifespan(app: FastAPI):
     print("🚀 Starting Summarizer API...")
     
-    # # Pre-load embedding model at startup
-    # print("📦 Pre-loading embedding model...")
-    # embedding_manager = get_embedding_manager()
-    # _ = embedding_manager.model  # Trigger model loading
-    # print("✅ Embedding model loaded successfully!")
+    # Pre-load embedding model at startup
+    print("📦 Pre-loading embedding model...")
+    embedding_manager = get_embedding_manager()
+    _ = embedding_manager.model  # Trigger model loading
+    print("✅ Embedding model loaded successfully!")
     
     yield
     
