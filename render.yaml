@@ -3,7 +3,7 @@ services:
   - type: pserv
     name: summarizer-db
     plan: free
-    databaseName: summarizer_db
+    databaseName: summarizer-db
     user: summarizer
 
   # Backend Web Service
