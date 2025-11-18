@@ -5,7 +5,7 @@ services:
     plan: free
     region: oregon
     repo: https://github.com/JKristilere/Smart-Summarizer
-    branch: main
+    branch: master
     rootDir: backend
     dockerfilePath: ./Dockerfile
     dockerContext: .
