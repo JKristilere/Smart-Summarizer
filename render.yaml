@@ -1,16 +1,15 @@
 services:
-  # PostgreSQL Database
+  # PostgreSQL database
   - type: pserv
     name: summarizer-db
     plan: free
-    databaseName: summarizer-db
-    user: summarizer
+    runtime: postgresql
 
-  # Backend Web Service
+  # Backend Web API
   - type: web
     name: summarizer-backend
     runtime: docker
-    plan: free  # or 'starter' for $7/month
+    plan: free
     region: oregon
     repo: https://github.com/JKristilere/Smart-Summarizer
     branch: main
@@ -21,13 +20,52 @@ services:
       - key: DATABASE_URI
         fromDatabase:
           name: summarizer-db
-          property: postgresql://summarizer:pB5hh2rp7NiAJygt48VNXyDCOuTXw77v@dpg-d4e7j3m3jp1c73c0828g-a/summarizer_db_bzpz
+          property: DATABASE_URL
+
       - key: GROQ_API_KEY
         sync: false
+
       - key: CHROMA_API_KEY
         sync: false
+
       - key: CHROMA_TENANT
         sync: false
+
       - key: CHROMA_DATABASE
         sync: false
+
     healthCheckPath: /health
+
+# services:
+#   # PostgreSQL Database
+#   - type: pserv
+#     name: summarizer-db
+#     plan: free
+#     databaseName: summarizer-db
+#     user: summarizer
+
+#   # Backend Web Service
+#   - type: web
+#     name: summarizer-backend
+#     runtime: docker
+#     plan: free  # or 'starter' for $7/month
+#     region: oregon
+#     repo: https://github.com/JKristilere/Smart-Summarizer
+#     branch: main
+#     rootDir: backend
+#     dockerfilePath: ./Dockerfile
+#     dockerContext: .
+#     envVars:
+#       - key: DATABASE_URI
+#         fromDatabase:
+#           name: summarizer-db
+#           property: postgresql://summarizer:pB5hh2rp7NiAJygt48VNXyDCOuTXw77v@dpg-d4e7j3m3jp1c73c0828g-a/summarizer_db_bzpz
+#       - key: GROQ_API_KEY
+#         sync: false
+#       - key: CHROMA_API_KEY
+#         sync: false
+#       - key: CHROMA_TENANT
+#         sync: false
+#       - key: CHROMA_DATABASE
+#         sync: false
+#     healthCheckPath: /health
