@@ -12,7 +12,7 @@ services:
     runtime: docker
     plan: free  # or 'starter' for $7/month
     region: oregon
-    repo: https://github.com/YOUR_USERNAME/summarizer
+    repo: https://github.com/JKristilere/Smart-Summarizer
     branch: main
     rootDir: backend
     dockerfilePath: ./Dockerfile
@@ -21,7 +21,7 @@ services:
       - key: DATABASE_URI
         fromDatabase:
           name: summarizer-db
-          property: connectionString
+          property: postgresql://summarizer:pB5hh2rp7NiAJygt48VNXyDCOuTXw77v@dpg-d4e7j3m3jp1c73c0828g-a/summarizer_db_bzpz
       - key: GROQ_API_KEY
         sync: false
       - key: CHROMA_API_KEY
