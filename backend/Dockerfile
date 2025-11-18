@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=builder /root/.local /root/.local
 
 # Copy application code
-COPY ./app /app
+COPY . /app
 
 # Update PATH
 ENV PATH=/root/.local/bin:$PATH

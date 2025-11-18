@@ -9,7 +9,7 @@ services:
       - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-summarizer}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin123}
       POSTGRES_DB: ${POSTGRES_DB:-summarizer_db}
     ports:
       - "5432:5432"
