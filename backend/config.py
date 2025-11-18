@@ -1,28 +1,31 @@
-from dataclasses import dataclass
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 from typing import Optional
 
 
 class Settings(BaseSettings):
-    # Chroma settings
+    # Chroma settings (Required)
     CHROMA_API_KEY: str
     CHROMA_TENANT: str
     CHROMA_DATABASE: str
 
-    # LLM Settings
+    # LLM Settings (Required)
     GROQ_API_KEY: str
-    OLLAMA_API_KEY: str
-    OLLAMA_HOST: str
-    OLLAMA_MODEL: str
+    
+    # Ollama Settings (Optional)
+    OLLAMA_API_KEY: Optional[str] = ""
+    OLLAMA_HOST: Optional[str] = "http://localhost:11434"
+    OLLAMA_MODEL: Optional[str] = "llama3"
 
-    # Database Settings (PostGres)
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_PORT: str
-    POSTGRES_DB: str
-    POSTGRES_HOST: str
-    DATABASE_URI: str
+    # Database Settings
+    DATABASE_URI: str  # Main connection string (Required)
+    
+    # Individual PostgreSQL fields (Optional - for backward compatibility)
+    POSTGRES_USER: Optional[str] = "summarizer"
+    POSTGRES_PASSWORD: Optional[str] = ""
+    POSTGRES_PORT: Optional[str] = "5432"
+    POSTGRES_DB: Optional[str] = "summarizer_db"
+    POSTGRES_HOST: Optional[str] = "localhost"
 
     class Config:
         env_file = ".env"
