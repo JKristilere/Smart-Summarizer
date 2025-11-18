@@ -1,11 +1,4 @@
 services:
-  # PostgreSQL database
-  - type: pserv
-    name: summarizer-db
-    plan: free
-    runtime: postgresql
-
-  # Backend Web API
   - type: web
     name: summarizer-backend
     runtime: docker
@@ -20,17 +13,14 @@ services:
       - key: DATABASE_URI
         fromDatabase:
           name: summarizer-db
-          property: DATABASE_URL
+          property: connectionString
 
       - key: GROQ_API_KEY
         sync: false
-
       - key: CHROMA_API_KEY
         sync: false
-
       - key: CHROMA_TENANT
         sync: false
-
       - key: CHROMA_DATABASE
         sync: false
 
