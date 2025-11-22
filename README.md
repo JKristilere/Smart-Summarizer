@@ -45,7 +45,7 @@
 
    ```bash
    cd backend
-   python migrations.db_migrations
+   python -m migrations.db_migrations
    ```
 
 

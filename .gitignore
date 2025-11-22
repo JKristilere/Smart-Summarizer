@@ -32,4 +32,4 @@ Thumbs.db
 EOF
 
 # Add to .gitignore
-echo ".streamlit/secrets.toml" >> .gitignore
+/frontend/.streamlit/secrets.toml
