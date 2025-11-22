@@ -42,7 +42,39 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
+# Add this to backend/main.py
 
+@app.get("/test/chroma")
+async def test_chroma_connection():
+    """Test ChromaDB connection for debugging."""
+    try:
+        from config import settings
+        
+        # Show (sanitized) configuration
+        config_status = {
+            "CHROMA_API_KEY": "Set" if settings.CHROMA_API_KEY else "Missing",
+            "CHROMA_TENANT": settings.CHROMA_TENANT if settings.CHROMA_TENANT else "Missing",
+            "CHROMA_DATABASE": settings.CHROMA_DATABASE if settings.CHROMA_DATABASE else "Missing",
+        }
+        
+        # Try to connect
+        from app.db.chroma_db import verify_chroma_connection
+        connection_ok = verify_chroma_connection()
+        
+        return {
+            "status": "success" if connection_ok else "failed",
+            "config": config_status,
+            "connection": "established" if connection_ok else "failed"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "type": type(e).__name__
+        }
+    
+
+    
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     start_time = time.time()
